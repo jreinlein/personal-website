@@ -1,43 +1,15 @@
-.blurb {
-  padding-top: 25%;
-}
-
-.profile {
-  border-radius: 50%;
-  max-width: 100%;
-  opacity: 0.1;
-}
-
-p i {
-  font-size: 150%;
-  padding: 0.25em 0.5em 0.25em 0;
-  vertical-align: middle;
-}
-
-.social {
-  padding-top: 0.2em;
-  font-size: 400%;
-  text-align: center;
-}
-
-p {
-  margin-bottom: 1em;
-}
-
-span {
-  font-size: 125%;
-}
-
 @font-face {
   font-family: 'icomoon';
-  src: url('../fonts/icomoon.eot?rcyi6o');
-  src: url('../fonts/icomoon.eot?rcyi6o#iefix') format('embedded-opentype'), url('fonts/icomoon.ttf?rcyi6o') format('truetype'), url('../fonts/icomoon.woff?rcyi6o') format('woff'), url('fonts/icomoon.svg?rcyi6o#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?rcyi6o');
+  src:  url('fonts/icomoon.eot?rcyi6o#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?rcyi6o') format('truetype'),
+    url('fonts/icomoon.woff?rcyi6o') format('woff'),
+    url('fonts/icomoon.svg?rcyi6o#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
 
-[class^="icon-"],
-[class*=" icon-"] {
+[class^="icon-"], [class*=" icon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon' !important;
   speak: none;
@@ -46,6 +18,7 @@ span {
   font-variant: normal;
   text-transform: none;
   line-height: 1;
+
   /* Better Font Rendering =========== */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -54,119 +27,90 @@ span {
 .icon-home:before {
   content: "\e900";
 }
-
 .icon-home3:before {
   content: "\e902";
 }
-
 .icon-office:before {
   content: "\e903";
 }
-
 .icon-newspaper:before {
   content: "\e904";
 }
-
 .icon-book:before {
   content: "\e91f";
 }
-
 .icon-books:before {
   content: "\e920";
 }
-
 .icon-library:before {
   content: "\e921";
 }
-
 .icon-file-text2:before {
   content: "\e926";
 }
-
 .icon-location:before {
   content: "\e947";
 }
-
 .icon-location2:before {
   content: "\e948";
 }
-
 .icon-keyboard:before {
   content: "\e955";
 }
-
 .icon-box-add:before {
   content: "\e95e";
 }
-
 .icon-download:before {
   content: "\e960";
 }
-
 .icon-bubble:before {
   content: "\e96b";
 }
-
 .icon-bubbles:before {
   content: "\e96c";
 }
-
 .icon-bubbles2:before {
   content: "\e96d";
 }
-
 .icon-quotes-left:before {
   content: "\e977";
 }
-
 .icon-quotes-right:before {
   content: "\e978";
 }
-
 .icon-download2:before {
   content: "\e9c5";
 }
-
 .icon-download3:before {
   content: "\e9c7";
 }
-
 .icon-embed:before {
   content: "\ea7f";
 }
-
 .icon-embed2:before {
   content: "\ea80";
 }
-
 .icon-terminal:before {
   content: "\ea81";
 }
-
 .icon-mail:before {
   content: "\ea83";
 }
-
 .icon-mail2:before {
   content: "\ea84";
 }
-
 .icon-mail4:before {
   content: "\ea86";
 }
-
 .icon-github:before {
   content: "\eab0";
 }
-
 .icon-linkedin:before {
   content: "\eac9";
 }
-
 .icon-linkedin2:before {
   content: "\eaca";
 }
-
 .icon-file-pdf:before {
   content: "\eadf";
 }
