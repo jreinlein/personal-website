@@ -52,6 +52,10 @@ a:hover {
   text-align: center;
 }
 
+.oops {
+  text-align: center;
+}
+
 @font-face {
   font-family: 'icomoon';
   src: url('../fonts/icomoon.eot?rcyi6o');
