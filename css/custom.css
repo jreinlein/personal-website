@@ -1,11 +1,15 @@
-.blurb {
-  padding-top: 25%;
+.main {
+  margin-top: 25%;
 }
 
 .profile {
   border-radius: 50%;
   max-width: 100%;
-  opacity: 0.1;
+  margin: 0px;
+}
+
+.profile-row {
+  transform: translateY(1.5em);
 }
 
 p i {
@@ -16,11 +20,16 @@ p i {
 
 body {
   color: rgb(60, 60, 60);
+  background-color: rgb(240, 240, 240);
+}
+
+h1 {
+  font-weight: bold;
 }
 
 .social {
-  padding-top: 0.25em;
-  font-size: 400%;
+  padding-top: 0.2em;
+  font-size: 500%;
   text-align: center;
 }
 
