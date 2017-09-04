@@ -9,13 +9,17 @@
 }
 
 p i {
-  font-size: 150%;
+  font-size: 200%;
   padding: 0.25em 0.5em 0.25em 0;
   vertical-align: middle;
 }
 
+body {
+  color: rgb(60, 60, 60);
+}
+
 .social {
-  padding-top: 0.2em;
+  padding-top: 0.25em;
   font-size: 400%;
   text-align: center;
 }
@@ -26,6 +30,19 @@ p {
 
 span {
   font-size: 125%;
+}
+
+a {
+  text-decoration: none;
+  color: #6B8F9B;
+  font-weight: bold;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+  color: #375663;
+  animation-name: pulse;
+  transition: color 0.2s ease-in-out;
 }
 
 @font-face {
