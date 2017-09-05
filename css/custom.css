@@ -36,14 +36,22 @@ a:hover {
 }
 
 .main {
-  margin-top: 25%;
+  margin-top: 5%;
 }
 
 .profile {
   border-radius: 50%;
   max-width: 100%;
   margin: 0px;
-  transform: translateY(1.5em);
+}
+
+@media only screen and (min-width: 550px) {
+  .profile {
+    transform: translateY(1.5em);
+  }
+  .main {
+    margin-top: 25%;
+  }
 }
 
 .social {
