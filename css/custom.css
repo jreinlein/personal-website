@@ -24,15 +24,17 @@ span {
 
 a {
   text-decoration: none;
-  color: #6B8F9B;
-  font-weight: bold;
-  transition: color 0.2s ease-in-out;
+  color: #232347;
+  font-weight: bolder;
+  transition: color 0.8s ease-in-out, text-shadow 0.8s ease-in-out;
+  text-shadow: #232347 0 0 0.1rem; /* mainly to make text more prominent */
 }
 
 a:hover {
-  color: #375663;
+  color: #D5641C;
   animation-name: pulse;
-  transition: color 0.2s ease-in-out;
+  transition: color 0.2s ease-in-out, text-shadow 0.2s ease-in-out;
+  text-shadow: #D5641C 0 0 0.1rem;
 }
 
 .main {
@@ -62,63 +64,4 @@ a:hover {
 
 .oops {
   text-align: center;
-}
-
-@font-face {
-  font-family: 'icomoon';
-  src: url('../fonts/icomoon.eot?rcyi6o');
-  src: url('../fonts/icomoon.eot?rcyi6o#iefix') format('embedded-opentype'), url('fonts/icomoon.ttf?rcyi6o') format('truetype'), url('../fonts/icomoon.woff?rcyi6o') format('woff'), url('fonts/icomoon.svg?rcyi6o#icomoon') format('svg');
-  font-weight: normal;
-  font-style: normal;
-}
-
-[class^="icon-"],
-[class*=" icon-"] {
-  /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'icomoon' !important;
-  speak: none;
-  font-style: normal;
-  font-weight: normal;
-  font-variant: normal;
-  text-transform: none;
-  line-height: 1;
-  /* Better Font Rendering =========== */
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-.icon-office:before {
-  content: "\e903";
-}
-
-.icon-library:before {
-  content: "\e921";
-}
-
-.icon-file-text2:before {
-  content: "\e926";
-}
-
-.icon-location:before {
-  content: "\e947";
-}
-
-.icon-terminal:before {
-  content: "\ea81";
-}
-
-.icon-mail4:before {
-  content: "\ea86";
-}
-
-.icon-github:before {
-  content: "\eab0";
-}
-
-.icon-linkedin:before {
-  content: "\eac9";
-}
-
-.icon-linkedin2:before {
-  content: "\eaca";
 }
