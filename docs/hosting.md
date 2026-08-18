@@ -118,21 +118,61 @@ Lesson: `origin/master` can be years stale if nobody fetches. Don't infer
 push state from it, and don't infer it from the live site either — matching
 *content* does not mean matching *commits*.
 
-## Things not verified
+## TODO: check these in the Netlify dashboard
 
-Written from the outside; confirm against the Netlify dashboard if it matters:
+Everything above was determined from outside the dashboard — HTTP headers, DNS,
+and the repo. These are the gaps. They are ordered by how much damage the wrong
+assumption would do.
 
-- Whether a build command or publish directory is configured in Netlify's site
-  settings (assumed: none and repo root respectively).
-- Whether Netlify's asset optimization / post-processing is enabled.
-- Whether DNS is managed by Netlify DNS or an external registrar.
-- Whether the old repo's Pages setup can be retired without disturbing the
-  domain. It's inert today; the risk is in the config, not the content.
+**Do not record access tokens, deploy keys, build hooks, or environment variable
+values here or paste them into a chat.** None of the questions below need them;
+settings names and values are enough.
+
+- [ ] **Build settings** — *Site configuration → Build & deploy → Build settings*.
+      Record the build command, publish directory, and base directory.
+      **Why it matters most:** the pottery gallery adds a `package.json`, and
+      Netlify auto-detects those and may start running a build. That would turn
+      a deploy which currently works by doing nothing into one that can fail.
+      If a build command is empty, confirm it stays empty — or pin it explicitly
+      in a `netlify.toml` before Phase 1 lands.
+      *Assumed today: no build command, publish directory = repo root.*
+
+- [ ] **Latest deploy log** — *Deploys → click the top entry*.
+      Shows definitively what happens on a push: whether anything is executed,
+      how long it takes, and what gets published. Settles the above by evidence
+      rather than by reading a settings field.
+
+- [ ] **Post processing / asset optimization** — *Build & deploy → Post
+      processing*. Note whether image compression, CSS/JS bundling or minifying,
+      and Pretty URLs are on.
+      **Why:** if image compression is enabled, Netlify may re-encode the WebP
+      derivatives the gallery build tunes by hand, silently undoing that work.
+      Pretty URLs decides whether `/pottery` resolves without a trailing slash.
+
+- [ ] **Site name** — the `<name>.netlify.app` subdomain.
+      Gives a permanent URL to test deploys against that doesn't depend on DNS,
+      which is useful for isolating "is this a DNS problem or a deploy problem".
+
+- [ ] **Domain management** — which domains are attached, and whether DNS is
+      Netlify DNS or an external registrar. The apex resolves to `104.198.14.52`
+      (a Netlify load balancer), but *who manages the zone* is still unknown.
+      Only matters if the old GitHub repo is ever retired.
+
+- [ ] **Netlify Image CDN availability** and its limits on the current plan.
+      If available, `/.netlify/images?url=…&w=500` resizes on the fly, so the
+      gallery could commit only the ~1600px derivatives and let the CDN generate
+      thumbnails — roughly halving what goes into git. Trade-off: it adds a
+      runtime dependency to a site whose main virtue is being static files.
+      Evaluate, don't assume.
 
 ## Open cleanup
 
-- Retire `jreinlein/jreinlein.github.io` (archive it, drop its `CNAME`) to remove
-  the ambiguity permanently. Low priority — inert today, and touching
-  custom-domain config risks downtime.
+- Retire `jreinlein/jreinlein.github.io` (archive or delete) to remove the
+  ambiguity permanently. Verified 2026-08-17 that it cannot affect the live
+  site: the apex resolves to Netlify, and GitHub serves only a 301 from its own
+  `*.github.io` URL. The only thing lost is that redirect, which may appear in
+  old links. Archiving is preferable to deleting; afterwards confirm with
+  `curl -sSI https://jreinlein.github.io` whether Pages (and the redirect)
+  survived archiving — that is not certain.
 - Remove the stale `~/.ssh/id_rsa` on Windows, or replace it with an ed25519 key
   registered to GitHub, if SSH is ever wanted again.
