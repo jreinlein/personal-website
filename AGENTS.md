@@ -83,6 +83,12 @@ python -m http.server 8000
 
 ## In flight
 
-- [Pottery gallery](docs/pottery-gallery-plan.md) — a photo gallery at `/pottery`.
-  Read that doc before touching anything pottery-related; it covers the image
-  pipeline, why originals must stay out of git, and the EXIF/GPS stripping requirement.
+**→ [docs/next-steps.md](docs/next-steps.md) — start here.** Current status and
+what to pick up next, linking out to the detail.
+
+- [Pottery gallery](docs/pottery-gallery-plan.md) — a photo gallery at `/pottery`,
+  planned but not started. Read that doc before touching anything
+  pottery-related; it covers the image pipeline, why originals must stay out of
+  git, and the EXIF/GPS stripping requirement.
+- [Hosting & infrastructure](docs/hosting.md) — how the site is actually wired,
+  plus a checklist of things still to confirm in the Netlify dashboard.
