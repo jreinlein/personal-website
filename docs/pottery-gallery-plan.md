@@ -21,6 +21,31 @@ Purely a portfolio — no commerce, no contact-about-this-piece flow.
 | Build | Local script, run by hand; commit the generated output |
 | Hosting | Existing GitHub Pages setup, no new services, no cost |
 
+## The actual photo set (audited 2026-08-17)
+
+126 files sitting in the gitignored `originals/`. Measured, not assumed:
+
+```
+total photos      : 126   (all .jpg — no HEIC, no conversion step needed)
+missing EXIF date : 1     (IMG_0998.jpg)
+WITH GPS DATA     : 125   <-- every Apple photo is geotagged
+orientation       : 89 landscape / 37 portrait
+megapixels        : min 3.3 · median 12.2 · max 24.5
+file size         : median 2.0MB · total 256MB
+date range        : 2022-12 -> 2025-08, across 16 distinct months
+```
+
+Consequences:
+
+- **GPS stripping is load-bearing, not theoretical.** 125/126 embed location.
+  `sharp` drops metadata by default on resize, but Phase 1 verifies this on real
+  output rather than trusting the default.
+- **`IMG_0998.jpg` is the odd one out** — no date and no camera make, so likely a
+  screenshot or a photo received from someone else. Confirm it's even James's own
+  work before including it; if kept, it needs a manual `date` in `pottery.json`.
+- **Mixed orientation confirms masonry** over a square-cropped grid.
+- 256MB of originals should yield roughly 45MB of derivatives.
+
 ## Constraints
 
 - **GitHub Pages limits.** 1GB published site, ~100GB/month soft bandwidth cap.
@@ -117,8 +142,9 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 - [ ] Check on a real phone, and with JS disabled
 
 ### Phase 3 — Content
-- [ ] Drop the photo backlog into `originals/`
-- [ ] Run the build; fix any missing dates
+- [x] Photo backlog in `originals/` (126 files, audited above)
+- [ ] Decide whether `IMG_0998.jpg` belongs in the gallery at all
+- [ ] Run the build; give `IMG_0998.jpg` a manual date if kept
 - [ ] Fill in `pottery.json` from notes where they exist
 - [ ] Review output size before committing
 
