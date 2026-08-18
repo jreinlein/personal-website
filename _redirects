@@ -1,0 +1,22 @@
+# Netlify redirect rules.
+#
+# This site is a plain static deploy of the repo root: every committed
+# non-dotfile ships to the CDN and is reachable by URL. (Dotfiles such as
+# .gitignore and .claude/ are skipped by Netlify automatically and need no
+# rule here.) These rules return a 404 for project scaffolding that is in the
+# repo but is not part of the website.
+#
+# The trailing ! is required. Without it Netlify serves the matching file and
+# ignores the rule — static files win over redirects unless the rule is forced.
+#
+# Rule of thumb: anything the site actually serves must NOT be listed here.
+# When the pottery gallery lands, pottery/ img/pottery/ and css/pottery.css
+# stay off this list; scripts/ and package.json stay on it.
+
+/README.md          /404.html  404!
+/AGENTS.md          /404.html  404!
+/CLAUDE.md          /404.html  404!
+/docs/*             /404.html  404!
+/scripts/*          /404.html  404!
+/package.json       /404.html  404!
+/package-lock.json  /404.html  404!
