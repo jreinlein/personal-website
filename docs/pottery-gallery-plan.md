@@ -19,7 +19,7 @@ Purely a portfolio — no commerce, no contact-about-this-piece flow.
 | Metadata | Auto from EXIF; optional hand-written notes in a sidecar file |
 | Update cadence | Batches roughly once a month, once James rejoins a studio |
 | Build | Local script, run by hand; commit the generated output |
-| Hosting | Existing GitHub Pages setup, no new services, no cost |
+| Hosting | Existing Netlify setup, no new services, no cost |
 
 ## The actual photo set (audited 2026-08-17)
 
@@ -50,9 +50,9 @@ Consequences:
 
 ## Constraints
 
-- **GitHub Pages limits.** 1GB published site, ~100GB/month soft bandwidth cap.
-  Optimized derivatives keep us around 40–60MB for 150 photos — comfortable.
-  Committing originals would blow past this and is explicitly out of scope.
+- **Netlify free-tier bandwidth**: ~100GB/month. Optimized derivatives keep the
+  gallery around 45MB total — comfortable. Committing originals (256MB) would
+  burn through it and is explicitly out of scope.
 - **Git keeps binaries forever.** A bad commit of full-size originals permanently
   bloats the repo and is painful to undo. Originals stay gitignored.
 - **EXIF carries GPS.** iPhone photos embed location. Every published derivative
@@ -171,28 +171,29 @@ Deliberately out of scope for v1. Roughly in order of likely value:
   actually looks.
 - **AVIF alongside WebP** via `<picture>`. Another ~20-30% off. Marginal at this
   size; adds build time and complexity.
-- **GitHub Action to build on push.** Only worth it if the manual run becomes
-  annoying. At once-a-month it isn't.
-- **Cloudflare in front of the domain** if bandwidth ever becomes a concern.
-  Free, and unnecessary at current scale.
+- **Netlify build on push** instead of committing generated output. Only worth it
+  if the manual run becomes annoying. At once-a-month it isn't — and the current
+  no-build deploy is the thing that makes this site boring and reliable.
 
 ---
 
 ## Notes & open questions
 
+- **Hosting is Netlify, not GitHub Pages.** Confirmed 2026-08-17 via the `server:
+  Netlify` response header. Netlify deploys the repo root verbatim on every push
+  to `master` — no build command, no site generator. An earlier `_config.yml`
+  written on the GitHub-Pages assumption did nothing and was removed. Check the
+  `server` header before assuming a hosting mechanism here.
 - **`jreinlein.github.io` is a decoy.** That repo last shipped in Jan 2017 and
-  still contains a `CNAME` for `jamesreinlein.com`, so its `*.github.io` URL
-  redirects to the custom domain. The domain actually serves **this** repo
-  (`personal-website`), verified 2026-08-17. Do all work here.
-  Low-priority cleanup: retire the old repo (archive it / drop its `CNAME`) to
-  remove the ambiguity — but it's inert today and fiddling with custom-domain
-  config risks downtime, so leave it unless there's a reason.
-- This repo has **no** `CNAME` file, meaning the custom domain is configured in
-  Pages settings only. Worth confirming that's intentional; adding one is the
-  more durable setup, but only once the old repo's claim is sorted out.
+  its GitHub Pages setup still holds a `CNAME` for `jamesreinlein.com`, so its
+  `*.github.io` URL 301s to the domain — which DNS points at Netlify. GitHub
+  Pages never serves this site. Do all work in `personal-website`. Low-priority
+  cleanup: retire the old repo to remove the ambiguity, but it's inert today and
+  fiddling with domain config risks downtime.
 - Confirm the backlog is genuinely all JPG before building — a stray HEIC will
   need `sharp` extras or a re-export from Apple Photos.
-- **This doc is committed but not published.** Pages serves every committed file
-  from the repo root, so `_config.yml` excludes `docs/`, `scripts/`,
-  `package.json` and the agent files from the built site. Anything added in
-  Phase 1 that isn't part of the website needs adding to that `exclude:` list.
+- **This doc is committed but not reachable.** Everything committed ships to the
+  CDN, so `_redirects` returns a forced 404 for `docs/`, `scripts/`,
+  `package.json` and the agent files. Anything added in Phase 1 that isn't part
+  of the website needs a rule there — and anything the gallery serves
+  (`pottery/`, `img/pottery/`, `css/pottery.css`) must stay off it.
