@@ -1,6 +1,6 @@
 # Next Steps
 
-Single entry point for outstanding work. Last updated 2026-08-17.
+Single entry point for outstanding work. Last updated 2026-08-18.
 
 This is an **index, not a spec** — it links to the docs that hold the detail
 rather than repeating them, so there's only one copy of each fact to keep
@@ -22,24 +22,25 @@ Verified working as of 2026-08-17:
 - Netlify auto-deploys on push to `master`; `git push` over HTTPS works.
 - 126 source photos sit in the gitignored `originals/`, all JPG, all dated.
 
+Verified in the Netlify dashboard as of 2026-08-18 (→ [hosting.md — checklist](hosting.md#netlify-dashboard-checklist--completed-2026-08-18)):
+
+- No build command, no publish directory override, nothing currently executes
+  on push — confirmed by both settings and the actual deploy log.
+- Pretty URLs are on, so `/pottery` will resolve without a trailing slash.
+- **No environment variables are set at all — no `NODE_VERSION` pinned.** If
+  Phase 1 adds `package.json` without pinning a version, a future build would
+  run against whatever ancient default Netlify resolves to. Reinforces the
+  Pillow/no-npm option below.
+- DNS is externally managed, not Netlify DNS. Netlify subdomain is
+  `jreinlein.netlify.app`. Image CDN is available but its free-plan quota
+  isn't documented in-dashboard — check the pricing page if it's going to be
+  relied on.
+
 ---
 
 ## Next up, in order
 
-### 1. Netlify dashboard checklist — do this *before* Phase 1
-
-→ [hosting.md — TODO](hosting.md#todo-check-these-in-the-netlify-dashboard)
-
-Six things to read out of the Netlify dashboard. The important one is **build
-settings**: Phase 1 introduces a `package.json`, and Netlify may auto-detect it
-and start running a build. That would convert a deploy which currently succeeds
-by doing nothing into one that can fail. Worth five minutes before writing code.
-
-If a build command turns out to be configured — or if pinning it seems wise
-either way — add a `netlify.toml` that sets the publish directory and an empty
-build command explicitly, so the deploy can't change behaviour on its own.
-
-### 2. Re-examine the gallery architecture before writing any of it
+### 1. Re-examine the gallery architecture before writing any of it
 
 The plan currently plans to add `sharp`, a `package.json`, `node_modules`, a Node
 build script, and a CDN lightbox library to a site whose entire virtue is being
@@ -78,18 +79,18 @@ The point is not to pre-decide — it is to make this an explicit choice at the 
 of Phase 1 instead of inheriting it from a plan written before the photos were
 audited.
 
-### 3. Pottery gallery, Phase 1 — the build pipeline
+### 2. Pottery gallery, Phase 1 — the build pipeline
 
 → [pottery-gallery-plan.md — Phases](pottery-gallery-plan.md#phases)
 
 Scan `originals/`, read EXIF, emit resized WebP derivatives with metadata
 stripped. **125 of the 126 photos carry GPS EXIF**, so verify stripping on real
 output rather than trusting any library's default. Tooling choice depends on the
-outcome of step 2 — the plan document currently assumes `sharp`.
+outcome of step 1 above — the plan document currently assumes `sharp`.
 
 Phases 2 (the page itself) and 3 (content and annotations) follow.
 
-### 4. Rewrite the 404 page — independent, can be done anytime
+### 3. Rewrite the 404 page — independent, can be done anytime
 
 `404.html` has real problems, several of which got worse when `_redirects` began
 routing all hidden scaffolding through it:

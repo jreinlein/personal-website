@@ -118,52 +118,73 @@ Lesson: `origin/master` can be years stale if nobody fetches. Don't infer
 push state from it, and don't infer it from the live site either — matching
 *content* does not mean matching *commits*.
 
-## TODO: check these in the Netlify dashboard
+## Netlify dashboard checklist — completed 2026-08-18
 
-Everything above was determined from outside the dashboard — HTTP headers, DNS,
-and the repo. These are the gaps. They are ordered by how much damage the wrong
-assumption would do.
+Checked directly in the dashboard (project `jreinlein`, team "James Reinlein's
+team", Free/Legacy plan). Ordered as originally planned, by how much damage the
+wrong assumption would have done.
 
-**Do not record access tokens, deploy keys, build hooks, or environment variable
-values here or paste them into a chat.** None of the questions below need them;
-settings names and values are enough.
+- [x] **Build settings** — *Project configuration → Build & deploy →
+      Continuous deployment*. Confirmed: Runtime not set, Base directory `/`,
+      Package directory not set, **Build command: Not set**, **Publish
+      directory: Not set** (defaults to repo root), Functions directory
+      `netlify/functions` (unused), Deploy log visibility public, Build status
+      Active. Matches the assumption exactly — nothing to pin yet, but see the
+      Node version note below before Phase 1 adds `package.json`.
 
-- [ ] **Build settings** — *Site configuration → Build & deploy → Build settings*.
-      Record the build command, publish directory, and base directory.
-      **Why it matters most:** the pottery gallery adds a `package.json`, and
-      Netlify auto-detects those and may start running a build. That would turn
-      a deploy which currently works by doing nothing into one that can fail.
-      If a build command is empty, confirm it stays empty — or pin it explicitly
-      in a `netlify.toml` before Phase 1 lands.
-      *Assumed today: no build command, publish directory = repo root.*
+- [x] **Latest deploy log** — deploy `ad55b8e` (2026-08-17 9:43 PM). Summary:
+      "3 new files uploaded, 3 assets changed. 7 redirect rules processed, all
+      deployed without errors." Build time 5s, total deploy time 4s. This is
+      upload-and-redirect-processing time, not compilation — confirms by
+      evidence (not just settings) that nothing currently executes on push.
 
-- [ ] **Latest deploy log** — *Deploys → click the top entry*.
-      Shows definitively what happens on a push: whether anything is executed,
-      how long it takes, and what gets published. Settles the above by evidence
-      rather than by reading a settings field.
+- [x] **Post processing / asset optimization** — *Build & deploy → Post
+      processing*. The image-compression/CSS-JS-minify toggle described in the
+      original TODO **no longer exists in Netlify's UI** — apparently removed
+      as a product, not just off. What's actually there: Legacy Prerendering
+      (deprecated, unused), Snippet injection (none added), **Pretty URLs:
+      enabled**. Pretty URLs being on means `/pottery` (no trailing slash,
+      no `.html`) will resolve once that page exists, without needing a
+      redirect rule for it.
 
-- [ ] **Post processing / asset optimization** — *Build & deploy → Post
-      processing*. Note whether image compression, CSS/JS bundling or minifying,
-      and Pretty URLs are on.
-      **Why:** if image compression is enabled, Netlify may re-encode the WebP
-      derivatives the gallery build tunes by hand, silently undoing that work.
-      Pretty URLs decides whether `/pottery` resolves without a trailing slash.
+- [x] **Site name** — `jreinlein.netlify.app`, not `jamesreinlein` — the
+      Netlify project is named `jreinlein`. Useful as a DNS-independent test
+      URL; use the actual subdomain, not an assumed one.
 
-- [ ] **Site name** — the `<name>.netlify.app` subdomain.
-      Gives a permanent URL to test deploys against that doesn't depend on DNS,
-      which is useful for isolating "is this a DNS problem or a deploy problem".
+- [x] **Domain management** — Production domains: `jamesreinlein.com`
+      (primary), `www.jamesreinlein.com` (auto-redirects to primary),
+      `jreinlein.netlify.app`. No Netlify-DNS nameserver panel is shown on
+      this page, which means the zone is **externally managed**, not Netlify
+      DNS — consistent with only the apex IP being previously known. SSL is
+      Let's Encrypt, auto-renews before Oct 8 2026.
 
-- [ ] **Domain management** — which domains are attached, and whether DNS is
-      Netlify DNS or an external registrar. The apex resolves to `104.198.14.52`
-      (a Netlify load balancer), but *who manages the zone* is still unknown.
-      Only matters if the old GitHub repo is ever retired.
+- [x] **Netlify Image CDN availability** — "Image transformations" exists as
+      a tracked usage category under Team → Usage & billing → Account usage
+      insights, currently zero usage, so the feature is available to use.
+      Its exact quota isn't in the Free/Legacy plan's bullet list of included
+      features, though (300 build minutes, 100 GB bandwidth, 1M Edge Function
+      invocations, 1 concurrent build, 500 projects) — confirm the real limit
+      on the pricing page before designing around it rather than assuming.
 
-- [ ] **Netlify Image CDN availability** and its limits on the current plan.
-      If available, `/.netlify/images?url=…&w=500` resizes on the fly, so the
-      gallery could commit only the ~1600px derivatives and let the CDN generate
-      thumbnails — roughly halving what goes into git. Trade-off: it adds a
-      runtime dependency to a site whose main virtue is being static files.
-      Evaluate, don't assume.
+### New finding: no environment variables are set
+
+*Project configuration → Environment variables* shows **zero variables of any
+kind** — no `NODE_VERSION`, nothing. This is what's actually behind the
+"Your project uses Node.js 10" banner on the project overview page: that
+banner is Netlify nudging toward its new **Agent Runners** AI-agent feature,
+which wants Node 22+, and Node 10 is what it detects as the effective default
+in this project's config. It is **not** a warning about the live deploy
+pipeline — a red herring for that purpose, since no build runs today.
+
+It's still directly relevant to next-steps.md's item 2, though: if
+Phase 1 adds a `package.json` without pinning a version (via `NODE_VERSION` or
+`.nvmrc`), a future build would run against whatever Netlify's ancient default
+resolves to, not a version anyone chose. If the Pillow/no-npm route is taken
+instead, this whole class of problem disappears along with `package.json`
+itself — one more point in its favor.
+
+Build image, separately, is current: **Ubuntu Noble 24.04 (default)** — no
+action needed there.
 
 ## Open cleanup
 
