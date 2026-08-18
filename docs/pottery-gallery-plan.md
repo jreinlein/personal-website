@@ -40,9 +40,11 @@ Consequences:
 - **GPS stripping is load-bearing, not theoretical.** 125/126 embed location.
   `sharp` drops metadata by default on resize, but Phase 1 verifies this on real
   output rather than trusting the default.
-- **`IMG_0998.jpg` is the odd one out** — no date and no camera make, so likely a
-  screenshot or a photo received from someone else. Confirm it's even James's own
-  work before including it; if kept, it needs a manual `date` in `pottery.json`.
+- **`IMG_0998.jpg` has no EXIF at all** — no date, no camera make. Confirmed by
+  James as his own work; the metadata was lost somewhere along the way. Its
+  filename-sequential neighbours date it confidently: `IMG_0997` at
+  2024-01-03 10:44:19 and `IMG_0999` at 2024-01-03 10:45:58, so it belongs to
+  that same 2024-01-03 session. Resolved — no manual entry needed.
 - **Mixed orientation confirms masonry** over a square-cropped grid.
 - 256MB of originals should yield roughly 45MB of derivatives.
 
@@ -80,6 +82,10 @@ so the script's output is checked in. Never hand-edit anything under
 
 1. Scan `originals/*.jpg`.
 2. Per photo, read EXIF `DateTimeOriginal` + pixel dimensions via `sharp`.
+   If the date is missing, interpolate from the nearest filename-sequential
+   neighbours that do have one (iPhone `IMG_####` names increase monotonically,
+   so a gap between two same-session shots is reliable). Fall back to a manual
+   `date` in `pottery.json` only when interpolation can't bracket it.
 3. Merge with `pottery.json` — sidecar values win over EXIF (lets a wrong or
    missing date be corrected by hand).
 4. Emit resized WebP derivatives, **metadata stripped**, into `img/pottery/`.
@@ -143,8 +149,8 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 
 ### Phase 3 — Content
 - [x] Photo backlog in `originals/` (126 files, audited above)
-- [ ] Decide whether `IMG_0998.jpg` belongs in the gallery at all
-- [ ] Run the build; give `IMG_0998.jpg` a manual date if kept
+- [x] `IMG_0998.jpg` confirmed as James's work; date resolved by interpolation
+- [ ] Run the build; confirm all 126 land with a sensible date
 - [ ] Fill in `pottery.json` from notes where they exist
 - [ ] Review output size before committing
 
