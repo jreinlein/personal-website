@@ -1,2 +1,8 @@
 /v1/
 .idea
+
+# Full-size iPhone originals — local only, never committed.
+# Git keeps binaries forever; only generated derivatives in img/pottery/ ship.
+/originals/
+
+node_modules/
