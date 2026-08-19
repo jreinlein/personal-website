@@ -10,17 +10,30 @@ current. Delete items as they land.
 
 ## Where things stand
 
-The pottery gallery is **planned but not started** — no code written yet. What
-exists so far is groundwork: the infrastructure is now understood and documented,
-the photo set is audited, and the repo is set up so scaffolding doesn't leak onto
+The pottery gallery's **build pipeline (Phase 1) is done**; the page itself
+(Phase 2) is not started. The infrastructure is understood and documented, the
+photo set is audited, and the repo is set up so scaffolding doesn't leak onto
 the public site.
 
-Verified working as of 2026-08-17:
+Verified working as of 2026-08-19:
 
-- `_redirects` hides `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md` from the live
-  site while every real asset still serves.
+- `_redirects` hides `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `scripts/`
+  from the live site while every real asset still serves.
 - Netlify auto-deploys on push to `master`; `git push` over HTTPS works.
 - 126 source photos sit in the gitignored `originals/`, all JPG, all dated.
+- [scripts/build_gallery.py](../scripts/build_gallery.py) ran against all 126
+  real photos: reads EXIF date + dimensions, interpolates the one missing date
+  (`IMG_0998.jpg`), resizes to two WebP sizes (thumb ~500px, large ~1600px
+  long edge), strips all metadata, and writes stub `pottery.json` entries.
+  Output is 7.8MB in `img/pottery/` — well under the 45MB estimate.
+- GPS/EXIF stripping is verified two ways: the script re-checks every output
+  file's EXIF after writing it, and
+  [scripts/test_build_gallery.py](../scripts/test_build_gallery.py) round-trips
+  a synthetic geotagged JPEG through the real resize function in a standalone
+  pytest suite (`python -m pytest scripts/test_build_gallery.py`) that doesn't
+  depend on `originals/` existing, so it also runs on a fresh clone or in CI.
+  Both currently report clean on all 126 photos.
+- `img/pottery/` and `pottery.json` are new, untracked, and not yet committed.
 
 Verified in the Netlify dashboard as of 2026-08-18 (→ [hosting.md — checklist](hosting.md#netlify-dashboard-checklist--completed-2026-08-18)):
 
@@ -81,16 +94,19 @@ before the first `npm install` rather than after. Decisions:
 `sharp` references replaced with Pillow, `scripts/build-gallery.mjs` renamed
 `scripts/build_gallery.py`.
 
-### 2. Pottery gallery, Phase 1 — the build pipeline
+### 2. Pottery gallery, Phase 2 — the page itself
 
 → [pottery-gallery-plan.md — Phases](pottery-gallery-plan.md#phases)
 
-Scan `originals/`, read EXIF, emit resized WebP derivatives with metadata
-stripped. **125 of the 126 photos carry GPS EXIF**, so verify stripping on real
-output rather than trusting any library's default. Tooling is Pillow (Python),
-per the decision in step 1 above.
+Phase 1 (pipeline) is done — see "Where things stand" above. Next: render
+`pottery/index.html` from the same EXIF + `pottery.json` data the script
+already loads, add `css/pottery.css` (masonry grid matching the existing
+Skeleton look), wire up PhotoSwipe v5 for the lightbox, link `/pottery` from
+`index.html`, and add `<title>`/OG tags. Then check on a real phone and with
+JS disabled.
 
-Phases 2 (the page itself) and 3 (content and annotations) follow.
+Phase 3 (fill in `pottery.json` content/annotations, review output size,
+commit) follows.
 
 ---
 

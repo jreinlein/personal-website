@@ -1,7 +1,7 @@
 # Pottery Gallery — Scoping & Plan
 
-Status: **planned, not started**
-Last updated: 2026-08-17
+Status: **Phase 1 (pipeline) complete; Phase 2 (page) not started**
+Last updated: 2026-08-19
 
 Adds a photo gallery at `jamesreinlein.com/pottery` showing James's pottery work.
 Purely a portfolio — no commerce, no contact-about-this-piece flow.
@@ -137,11 +137,18 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 ## Phases
 
 ### Phase 1 — Pipeline
-- [ ] Add `originals/` to `.gitignore`
-- [ ] `scripts/build_gallery.py` (Python + Pillow, no `package.json`/npm): scan,
+- [x] Add `originals/` to `.gitignore`
+- [x] `scripts/build_gallery.py` (Python + Pillow, no `package.json`/npm): scan,
       EXIF read, resize, strip metadata, emit derivatives
-- [ ] Verify GPS/EXIF is actually gone from output (spot-check with `exiftool`)
-- [ ] Report missing dates so they can be corrected in `pottery.json`
+- [x] Verify GPS/EXIF is actually gone from output. No `exiftool` on this
+      machine, so verification is built into the script itself
+      (`verify_stripped()` re-opens every derivative and checks `getexif()`
+      is empty) plus a standalone test suite —
+      [scripts/test_build_gallery.py](../scripts/test_build_gallery.py) round-trips
+      a synthetic geotagged JPEG through the real `resize_stripped()` and
+      asserts the GPS IFD is gone. Both passed against all 126 real photos.
+- [x] Report missing dates so they can be corrected in `pottery.json` — only
+      `IMG_0998.jpg`, resolved by interpolation as planned above.
 
 ### Phase 2 — Page
 - [ ] HTML generation into `pottery/index.html`
@@ -154,7 +161,7 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 ### Phase 3 — Content
 - [x] Photo backlog in `originals/` (126 files, audited above)
 - [x] `IMG_0998.jpg` confirmed as James's work; date resolved by interpolation
-- [ ] Run the build; confirm all 126 land with a sensible date
+- [x] Run the build; confirm all 126 land with a sensible date
 - [ ] Fill in `pottery.json` from notes where they exist
 - [ ] Review output size before committing
 
