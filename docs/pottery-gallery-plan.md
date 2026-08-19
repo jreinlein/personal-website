@@ -18,7 +18,7 @@ Purely a portfolio — no commerce, no contact-about-this-piece flow.
 | Source photos | iPhone JPGs (not HEIC — no conversion step needed) |
 | Metadata | Auto from EXIF; optional hand-written notes in a sidecar file |
 | Update cadence | Batches roughly once a month, once James rejoins a studio |
-| Build | Local script, run by hand; commit the generated output |
+| Build | Local script (Python + Pillow, no npm), run by hand; commit the generated output |
 | Hosting | Existing Netlify setup, no new services, no cost |
 
 ## The actual photo set (audited 2026-08-17)
@@ -38,8 +38,8 @@ date range        : 2022-12 -> 2025-08, across 16 distinct months
 Consequences:
 
 - **GPS stripping is load-bearing, not theoretical.** 125/126 embed location.
-  `sharp` drops metadata by default on resize, but Phase 1 verifies this on real
-  output rather than trusting the default.
+  Pillow doesn't carry EXIF into the resized/re-encoded output by default, but
+  Phase 1 verifies this on real output rather than trusting the default.
 - **`IMG_0998.jpg` has no EXIF at all** — no date, no camera make. Confirmed by
   James as his own work; the metadata was lost somewhere along the way. Its
   filename-sequential neighbours date it confidently: `IMG_0997` at
@@ -67,7 +67,7 @@ Consequences:
 ```
 originals/               # gitignored. Full-size iPhone JPGs, local only.
 pottery.json             # committed. Optional per-photo notes, keyed by filename.
-scripts/build-gallery.mjs# committed. Reads originals/ + pottery.json -> output.
+scripts/build_gallery.py # committed. Reads originals/ + pottery.json -> output.
 img/pottery/             # committed, GENERATED. Derivatives only.
   thumb/<name>.webp      #   ~500px wide,      q75,  ~30-60KB
   large/<name>.webp      #   ~1600px long edge, q80, ~150-350KB
@@ -80,8 +80,12 @@ so the script's output is checked in. Never hand-edit anything under
 
 ### Pipeline
 
-1. Scan `originals/*.jpg`.
-2. Per photo, read EXIF `DateTimeOriginal` + pixel dimensions via `sharp`.
+1. Scan `originals/*.jpg` — every run processes the full set, not just new
+   files. At 126 photos this is seconds locally, and it means a settings
+   change (quality, size) reliably reaches every derivative rather than only
+   photos added after the change. Revisit only if the backlog grows enough
+   that a full regen becomes annoying.
+2. Per photo, read EXIF `DateTimeOriginal` + pixel dimensions via Pillow.
    If the date is missing, interpolate from the nearest filename-sequential
    neighbours that do have one (iPhone `IMG_####` names increase monotonically,
    so a gap between two same-session shots is reliable). Fall back to a manual
@@ -134,8 +138,8 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 
 ### Phase 1 — Pipeline
 - [ ] Add `originals/` to `.gitignore`
-- [ ] `package.json` with `sharp` + an `npm run gallery` script
-- [ ] `scripts/build-gallery.mjs`: scan, EXIF read, resize, strip metadata, emit
+- [ ] `scripts/build_gallery.py` (Python + Pillow, no `package.json`/npm): scan,
+      EXIF read, resize, strip metadata, emit derivatives
 - [ ] Verify GPS/EXIF is actually gone from output (spot-check with `exiftool`)
 - [ ] Report missing dates so they can be corrected in `pottery.json`
 
@@ -191,9 +195,10 @@ Deliberately out of scope for v1. Roughly in order of likely value:
   cleanup: retire the old repo to remove the ambiguity, but it's inert today and
   fiddling with domain config risks downtime.
 - Confirm the backlog is genuinely all JPG before building — a stray HEIC will
-  need `sharp` extras or a re-export from Apple Photos.
+  need Pillow's HEIF plugin (an extra dependency) or a re-export from Apple
+  Photos.
 - **This doc is committed but not reachable.** Everything committed ships to the
-  CDN, so `_redirects` returns a forced 404 for `docs/`, `scripts/`,
-  `package.json` and the agent files. Anything added in Phase 1 that isn't part
-  of the website needs a rule there — and anything the gallery serves
-  (`pottery/`, `img/pottery/`, `css/pottery.css`) must stay off it.
+  CDN, so `_redirects` returns a forced 404 for `docs/`, `scripts/`, and the
+  agent files. Anything added in Phase 1 that isn't part of the website needs a
+  rule there — and anything the gallery serves (`pottery/`, `img/pottery/`,
+  `css/pottery.css`) must stay off it.

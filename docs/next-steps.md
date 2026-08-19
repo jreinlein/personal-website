@@ -27,10 +27,10 @@ Verified in the Netlify dashboard as of 2026-08-18 (→ [hosting.md — checklis
 - No build command, no publish directory override, nothing currently executes
   on push — confirmed by both settings and the actual deploy log.
 - Pretty URLs are on, so `/pottery` will resolve without a trailing slash.
-- **No environment variables are set at all — no `NODE_VERSION` pinned.** If
-  Phase 1 adds `package.json` without pinning a version, a future build would
-  run against whatever ancient default Netlify resolves to. Reinforces the
-  Pillow/no-npm option below.
+- **No environment variables are set at all — no `NODE_VERSION` pinned.** Had
+  Phase 1 added `package.json` without pinning a version, a future build would
+  have run against whatever ancient default Netlify resolves to. One more
+  reason the Pillow/no-npm decision below is the right one.
 - DNS is externally managed, not Netlify DNS. Netlify subdomain is
   `jreinlein.netlify.app`. Image CDN is available but its free-plan quota
   isn't documented in-dashboard — check the pricing page if it's going to be
@@ -40,44 +40,46 @@ Verified in the Netlify dashboard as of 2026-08-18 (→ [hosting.md — checklis
 
 ## Next up, in order
 
-### 1. Re-examine the gallery architecture before writing any of it
+### 1. Gallery architecture — challenged and decided, 2026-08-18
 
-The plan currently plans to add `sharp`, a `package.json`, `node_modules`, a Node
-build script, and a CDN lightbox library to a site whose entire virtue is being
-five static files that have not broken in nine years. That deserves a hard look
-before the first `npm install`, not after.
+The plan originally called for `sharp`, a `package.json`, `node_modules`, a Node
+build script, and a CDN lightbox library on a site whose entire virtue is being
+five static files that have not broken in nine years. That got a hard look
+before the first `npm install` rather than after. Decisions:
 
-Specific things to challenge:
+- **Pillow, not `sharp`.** Python 3.10 with Pillow 9.5 is already installed and
+  already proved sufficient — the 2026-08-17 audit read EXIF dates, pixel
+  dimensions, orientation, camera make, and GPS presence from all 126 photos
+  with zero installs. Pillow also resizes, writes WebP, and strips metadata.
+  This removes `package.json`, `node_modules`, and the entire npm dependency —
+  and with them the risk that Netlify auto-detects a build.
+- **Generate the HTML on every run, don't hand-edit.** The script already has
+  every photo's EXIF and `pottery.json` note loaded to do the resize/strip
+  pass, so emitting `pottery/index.html` from the same data is nearly free —
+  and far less error-prone than hand-splicing new `<figure>` blocks into a
+  newest-first sorted list every month for years.
+- **Two static derivative sizes, skip the Netlify Image CDN.** Its free-tier
+  quota isn't documented anywhere in the dashboard or pricing page; a live
+  per-request dependency on an unknown limit is worse than baking two WebP
+  sizes ahead of time with a tool that's already running.
+- **Keep a script — one Python (Pillow) script, not a manual per-batch tool.**
+  125 of 126 photos are geotagged. **GPS stripping must be guaranteed, not
+  remembered** — a script makes it automatic; a manual process makes it
+  something to forget once. This was the strongest argument for keeping
+  automation at all.
+- **Full regen every run, not incremental.** The script reprocesses all of
+  `originals/` each time rather than skipping already-built photos. At 126
+  photos this costs seconds locally, and it guarantees a settings change
+  (quality, size) reaches every derivative instead of only new ones.
+- **PhotoSwipe, confirmed.** The one dependency that remains — it's the only
+  thing on the site that reaches out to a CDN. Kept because sequential
+  swipe-browsing and real pinch-zoom are worth it for a gallery meant to be
+  browsed on mobile; a plain `<dialog>` or a hand-rolled lightbox were the
+  zero-dependency alternatives considered and passed on.
 
-- **Is `sharp` needed at all?** Python 3.10 with Pillow 9.5 is **already
-  installed on this machine and already proved sufficient** — the 2026-08-17
-  audit read EXIF dates, pixel dimensions, orientation, camera make, and GPS
-  presence from all 126 photos with zero installs. Pillow also resizes, writes
-  WebP, and strips metadata. Going that route removes `package.json`,
-  `node_modules`, and the entire npm dependency — **and with them the risk that
-  Netlify auto-detects a build**, which is currently the top pre-Phase-1 concern.
-- **Does the HTML need generating on every run?** Generating it once and
-  hand-editing thereafter may be fine for a gallery that changes monthly.
-- **Is PhotoSwipe worth it?** A native `<dialog>`, or even plain links to the
-  full-size image, may be enough. Its real advantage is touch handling on mobile.
-- **Two derivative sizes, or one?** If the Netlify Image CDN is available, one
-  committed size plus on-the-fly resizing may be simpler.
-- **Does resizing need a script at all?** A batch export from Apple Photos or a
-  single ImageMagick invocation is a legitimate answer for a monthly job.
-
-Arguments on the other side, recorded so the decision is made honestly rather
-than by mood:
-
-- **GPS stripping must be guaranteed, not remembered.** 125 of 126 photos are
-  geotagged. A script makes stripping automatic; a manual process makes it
-  something to forget once. This is the strongest argument for automation.
-- Hand-maintaining 126 `<figure>` blocks with correct pixel dimensions is
-  error-prone, and PhotoSwipe needs those dimensions to be right.
-- Monthly batches over several years is a lot of repeated manual work.
-
-The point is not to pre-decide — it is to make this an explicit choice at the top
-of Phase 1 instead of inheriting it from a plan written before the photos were
-audited.
+→ [pottery-gallery-plan.md](pottery-gallery-plan.md) is updated to match — all
+`sharp` references replaced with Pillow, `scripts/build-gallery.mjs` renamed
+`scripts/build_gallery.py`.
 
 ### 2. Pottery gallery, Phase 1 — the build pipeline
 
@@ -85,8 +87,8 @@ audited.
 
 Scan `originals/`, read EXIF, emit resized WebP derivatives with metadata
 stripped. **125 of the 126 photos carry GPS EXIF**, so verify stripping on real
-output rather than trusting any library's default. Tooling choice depends on the
-outcome of step 1 above — the plan document currently assumes `sharp`.
+output rather than trusting any library's default. Tooling is Pillow (Python),
+per the decision in step 1 above.
 
 Phases 2 (the page itself) and 3 (content and annotations) follow.
 
