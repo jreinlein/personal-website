@@ -1,6 +1,6 @@
 # Next Steps
 
-Single entry point for outstanding work. Last updated 2026-08-18.
+Single entry point for outstanding work. Last updated 2026-08-19.
 
 This is an **index, not a spec** — it links to the docs that hold the detail
 rather than repeating them, so there's only one copy of each fact to keep
@@ -91,24 +91,6 @@ output rather than trusting any library's default. Tooling is Pillow (Python),
 per the decision in step 1 above.
 
 Phases 2 (the page itself) and 3 (content and annotations) follow.
-
-### 3. Rewrite the 404 page — independent, can be done anytime
-
-`404.html` has real problems, several of which got worse when `_redirects` began
-routing all hidden scaffolding through it:
-
-- **Relative stylesheet paths break at nested URLs.** The page links
-  `css/normalize.css`, so at `/docs/hosting.md` the browser requests
-  `/docs/css/normalize.css` → 404, and the page renders **completely unstyled**.
-  Verified 2026-08-17. Use root-relative paths (`/css/…`, `/img/…`). This is the
-  actual bug; the rest is polish.
-- **Stale metadata**: the description still reads "Software Developer at Amazon",
-  which has been wrong since 2019. `index.html` says Senior Software Engineer II
-  at Etsy.
-- **No way back.** There is no link to the homepage — it's a dead end.
-- `<title>` is just "James Reinlein", giving no indication it's an error page.
-- It loads three stylesheets while `index.html` loads four (no `icons.css`), and
-  uses inline `style=` attributes where `custom.css` already defines `.oops`.
 
 ---
 
