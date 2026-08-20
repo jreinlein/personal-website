@@ -6,6 +6,7 @@ sizes with all metadata stripped, and updates pottery.json with stubs for
 any newly seen photo. Full regen every run — see docs/pottery-gallery-plan.md.
 """
 
+import html
 import json
 from datetime import datetime
 from pathlib import Path
@@ -18,6 +19,8 @@ OUTPUT_DIR = ROOT / "img" / "pottery"
 THUMB_DIR = OUTPUT_DIR / "thumb"
 LARGE_DIR = OUTPUT_DIR / "large"
 POTTERY_JSON = ROOT / "pottery.json"
+PAGE_PATH = ROOT / "pottery" / "index.html"
+SITE_URL = "https://jamesreinlein.com"
 
 THUMB_WIDTH = 500
 THUMB_QUALITY = 75
@@ -111,6 +114,111 @@ def verify_stripped(path):
         return len(exif) == 0 and not has_gps
 
 
+def render_figure(photo, entry):
+    stem = photo["path"].stem
+    esc = html.escape
+    title = entry.get("title")
+    date_str = photo["date"].strftime("%B %Y") if photo["date"] else "undated"
+    alt = esc(title) if title else f"Pottery piece from {date_str}"
+
+    detail = " · ".join(esc(v) for v in (entry.get("clay"), entry.get("glaze")) if v)
+
+    caption_parts = []
+    if title:
+        caption_parts.append(f"<strong>{esc(title)}</strong>")
+    caption_parts.append(f'<span class="pottery-date">{date_str}</span>')
+    if detail:
+        caption_parts.append(f'<span class="pottery-detail">{detail}</span>')
+    if entry.get("notes"):
+        caption_parts.append(f'<span class="pottery-notes">{esc(entry["notes"])}</span>')
+    caption = "\n      ".join(caption_parts)
+
+    return f"""    <figure>
+      <a href="/img/pottery/large/{stem}.webp" target="_blank" rel="noreferrer"
+         data-pswp-width="{photo['large_width']}" data-pswp-height="{photo['large_height']}">
+        <img src="/img/pottery/thumb/{stem}.webp" alt="{alt}"
+             width="{photo['thumb_width']}" height="{photo['thumb_height']}"
+             loading="lazy" decoding="async">
+      </a>
+      <figcaption>
+        {caption}
+      </figcaption>
+    </figure>"""
+
+
+def render_page(photos, sidecar):
+    figures = "\n".join(render_figure(p, sidecar.get(p["filename"], {})) for p in photos)
+    og_image = f"{SITE_URL}/img/pottery/large/{photos[0]['path'].stem}.webp" if photos else ""
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Pottery — James Reinlein</title>
+  <meta name="description" content="A gallery of pottery thrown by James Reinlein.">
+  <meta name="author" content="James Reinlein">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Open Graph
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta property="og:title" content="Pottery — James Reinlein">
+  <meta property="og:description" content="A gallery of pottery thrown by James Reinlein.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="{SITE_URL}/pottery">
+  <meta property="og:image" content="{og_image}">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="/css/normalize.css">
+  <link rel="stylesheet" href="/css/skeleton.css">
+  <link rel="stylesheet" href="/css/custom.css">
+  <link rel="stylesheet" href="/css/icons.css">
+  <link rel="stylesheet" href="/css/pottery.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@5/dist/photoswipe.css">
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="/img/favicon.ico">
+</head>
+
+<body>
+  <div class="container">
+    <header class="pottery-header">
+      <h1><a href="/">James Reinlein</a> — Pottery</h1>
+      <p>{len(photos)} pieces, {photos[-1]['date'].strftime('%Y') if photos else ''}–{photos[0]['date'].strftime('%Y') if photos else ''}.</p>
+    </header>
+
+    <div class="pswp-gallery" id="pottery-gallery">
+{figures}
+    </div>
+  </div>
+
+  <script type="module">
+    import PhotoSwipeLightbox from 'https://cdn.jsdelivr.net/npm/photoswipe@5/dist/photoswipe-lightbox.esm.js';
+    const lightbox = new PhotoSwipeLightbox({{
+      gallery: '#pottery-gallery',
+      children: 'a',
+      pswpModule: () => import('https://cdn.jsdelivr.net/npm/photoswipe@5/dist/photoswipe.esm.js'),
+    }});
+    lightbox.init();
+  </script>
+</body>
+
+</html>
+"""
+
+
 def main():
     THUMB_DIR.mkdir(parents=True, exist_ok=True)
     LARGE_DIR.mkdir(parents=True, exist_ok=True)
@@ -152,10 +260,12 @@ def main():
         thumb = resize_stripped(base, THUMB_WIDTH, "width")
         thumb_path = THUMB_DIR / f"{photo['path'].stem}.webp"
         thumb.save(thumb_path, "WEBP", quality=THUMB_QUALITY)
+        photo["thumb_width"], photo["thumb_height"] = thumb.size
 
         large = resize_stripped(base, LARGE_LONG_EDGE, "long_edge")
         large_path = LARGE_DIR / f"{photo['path'].stem}.webp"
         large.save(large_path, "WEBP", quality=LARGE_QUALITY)
+        photo["large_width"], photo["large_height"] = large.size
 
     for photo in photos:
         sidecar.setdefault(photo["filename"], {})
@@ -164,6 +274,9 @@ def main():
     )
 
     photos.sort(key=lambda p: (p["date"] or datetime.min, p["filename"]), reverse=True)
+
+    PAGE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PAGE_PATH.write_text(render_page(photos, sidecar), encoding="utf-8")
 
     not_stripped = [
         f.name
@@ -185,6 +298,7 @@ def main():
     else:
         print("Verified: no EXIF/GPS data in any derivative.")
     print(f"Derivative output: {total_bytes / 1_000_000:.1f} MB in {OUTPUT_DIR}")
+    print(f"Wrote {PAGE_PATH}")
 
 
 if __name__ == "__main__":

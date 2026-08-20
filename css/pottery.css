@@ -1,0 +1,63 @@
+.pottery-header {
+  margin: 5% 0 2em;
+  text-align: center;
+}
+
+.pottery-header h1 {
+  font-weight: bold;
+}
+
+.pottery-header p {
+  color: rgb(120, 120, 120);
+}
+
+.pswp-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
+}
+
+.pswp-gallery figure {
+  margin: 0;
+  width: 100%;
+}
+
+@media only screen and (min-width: 550px) {
+  .pswp-gallery figure {
+    width: calc(50% - 0.5em);
+  }
+}
+
+@media only screen and (min-width: 900px) {
+  .pswp-gallery figure {
+    width: calc(33.3333% - 0.6667em);
+  }
+}
+
+.pswp-gallery a {
+  display: block;
+  text-shadow: none;
+}
+
+.pswp-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+.pswp-gallery figcaption {
+  padding: 0.4em 0.1em 0;
+  font-size: 80%;
+  font-weight: 400;
+}
+
+.pswp-gallery figcaption strong {
+  display: block;
+}
+
+.pswp-gallery figcaption span {
+  display: block;
+  font-size: 100%;
+  color: rgb(120, 120, 120);
+}
