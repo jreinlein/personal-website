@@ -10,10 +10,10 @@ current. Delete items as they land.
 
 ## Where things stand
 
-The pottery gallery's **build pipeline (Phase 1) is done**; the page itself
-(Phase 2) is not started. The infrastructure is understood and documented, the
-photo set is audited, and the repo is set up so scaffolding doesn't leak onto
-the public site.
+The pottery gallery's **build pipeline (Phase 1) and page (Phase 2) are both
+done**; only Phase 3 (filling in `pottery.json` content) remains. The
+infrastructure is understood and documented, the photo set is audited, and the
+repo is set up so scaffolding doesn't leak onto the public site.
 
 Verified working as of 2026-08-19:
 
@@ -24,8 +24,11 @@ Verified working as of 2026-08-19:
 - [scripts/build_gallery.py](../scripts/build_gallery.py) ran against all 126
   real photos: reads EXIF date + dimensions, interpolates the one missing date
   (`IMG_0998.jpg`), resizes to two WebP sizes (thumb ~500px, large ~1600px
-  long edge), strips all metadata, and writes stub `pottery.json` entries.
-  Output is 7.8MB in `img/pottery/` — well under the 45MB estimate.
+  long edge), strips all metadata, writes stub `pottery.json` entries, and
+  renders `pottery/index.html` from that same data. Output is 7.8MB in
+  `img/pottery/` — well under the 45MB estimate. **Committed and pushed
+  (commit `c72d5ab`)** — the pipeline output is live but not yet linked
+  anywhere reachable at that point in history.
 - GPS/EXIF stripping is verified two ways: the script re-checks every output
   file's EXIF after writing it, and
   [scripts/test_build_gallery.py](../scripts/test_build_gallery.py) round-trips
@@ -33,7 +36,28 @@ Verified working as of 2026-08-19:
   pytest suite (`python -m pytest scripts/test_build_gallery.py`) that doesn't
   depend on `originals/` existing, so it also runs on a fresh clone or in CI.
   Both currently report clean on all 126 photos.
-- `img/pottery/` and `pottery.json` are new, untracked, and not yet committed.
+- The page itself: `css/pottery.css` (flex-wrap grid, 1/2/3 columns by
+  viewport — switched from an initial CSS-columns masonry after it produced
+  a reading-order bug, see below), PhotoSwipe v5 wired via CDN ESM, `/pottery`
+  linked from `index.html`, `<title>`/description/OG tags set. Verified
+  locally via `python -m http.server` + the browser's DOM/network/console
+  inspection: responsive breakpoints at 375px and 1280px, PhotoSwipe opens
+  correctly (driven programmatically since the sandboxed browser pane
+  couldn't screenshot), and no-JS degradation (figure anchors point straight
+  at the full-size image). **Not yet checked on a real physical phone.**
+- Homepage nav: a hand-drawn vase SVG icon (`.icon-vase` in
+  `css/custom.css`) links `/pottery` from the social-icon row, since the
+  site's icon font has no pottery-shaped glyph. Icons reorganized into two
+  rows of two (email/LinkedIn, YouTube/pottery), and a pre-existing
+  `aria-label` typo (missing `=`) on the other three icons got fixed in the
+  same pass.
+- Fixed a reading-order bug in the gallery grid: CSS `column-count` masonry
+  fills column-by-column, so on a 2-column layout a brand-new photo could
+  sit next to one from years earlier. `css/pottery.css` now uses `flex-wrap`
+  instead, trading gap-free packing for DOM order matching visual row order.
+- `pottery/index.html`, `css/pottery.css`, and the `index.html` nav link are
+  **committed** (`91f9b83` homepage icons, `3fb4259` page generation) but
+  not yet pushed.
 
 Verified in the Netlify dashboard as of 2026-08-18 (→ [hosting.md — checklist](hosting.md#netlify-dashboard-checklist--completed-2026-08-18)):
 
@@ -94,19 +118,19 @@ before the first `npm install` rather than after. Decisions:
 `sharp` references replaced with Pillow, `scripts/build-gallery.mjs` renamed
 `scripts/build_gallery.py`.
 
-### 2. Pottery gallery, Phase 2 — the page itself
+### 2. Pottery gallery, Phase 3 — content
 
 → [pottery-gallery-plan.md — Phases](pottery-gallery-plan.md#phases)
 
-Phase 1 (pipeline) is done — see "Where things stand" above. Next: render
-`pottery/index.html` from the same EXIF + `pottery.json` data the script
-already loads, add `css/pottery.css` (masonry grid matching the existing
-Skeleton look), wire up PhotoSwipe v5 for the lightbox, link `/pottery` from
-`index.html`, and add `<title>`/OG tags. Then check on a real phone and with
-JS disabled.
+Phases 1 and 2 are done — see "Where things stand" above. What's left:
 
-Phase 3 (fill in `pottery.json` content/annotations, review output size,
-commit) follows.
+- Fill in `pottery.json` titles/clay/glaze/notes where they're known — every
+  entry is currently an empty stub, so the live page will show dates only
+  until this happens.
+- Check the page on a real phone, not just an emulated viewport.
+- Push (`91f9b83`, `3fb4259`) — this is the change that actually makes
+  `/pottery` reachable, since the Phase 1 commit shipped the derivatives but
+  nothing linked to them yet.
 
 ---
 

@@ -1,6 +1,6 @@
 # Pottery Gallery — Scoping & Plan
 
-Status: **Phase 1 (pipeline) complete; Phase 2 (page) not started**
+Status: **Phases 1–2 (pipeline, page) complete; Phase 3 (content) in progress**
 Last updated: 2026-08-19
 
 Adds a photo gallery at `jamesreinlein.com/pottery` showing James's pottery work.
@@ -151,12 +151,24 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
       `IMG_0998.jpg`, resolved by interpolation as planned above.
 
 ### Phase 2 — Page
-- [ ] HTML generation into `pottery/index.html`
-- [ ] `css/pottery.css` — masonry grid matching site styling
-- [ ] Wire up PhotoSwipe v5 + captions
-- [ ] Link to `/pottery` from `index.html`
-- [ ] `<title>`, description, Open Graph tags for link previews
-- [ ] Check on a real phone, and with JS disabled
+- [x] HTML generation into `pottery/index.html` — `render_page()`/`render_figure()`
+      in `scripts/build_gallery.py` emit it from the same EXIF + `pottery.json`
+      data the pipeline already loads, on every run.
+- [x] `css/pottery.css` — flex-wrap grid (1/2/3 columns by viewport width),
+      matching the existing Skeleton + `custom.css` look. Originally built as
+      CSS-columns masonry, but that fills column-by-column, which breaks
+      reading order (row N could pair a brand-new photo against one from years
+      earlier). Switched to flex-wrap so DOM order matches visual row order,
+      trading away gap-free packing for correct chronological order.
+- [x] Wire up PhotoSwipe v5 + captions — ESM from CDN, `data-pswp-width/height`
+      emitted from the actual derivative dimensions (not source EXIF). Verified
+      by driving the lightbox open programmatically in-browser.
+- [x] Link to `/pottery` from `index.html`
+- [x] `<title>`, description, Open Graph tags for link previews
+- [x] Checked responsive breakpoints (375px/1280px) and no-JS degradation
+      (figure anchors point straight at the full-size image) via the browser's
+      DOM/network inspection. **Not yet checked on a real physical phone** —
+      worth a manual pass before calling this fully done.
 
 ### Phase 3 — Content
 - [x] Photo backlog in `originals/` (126 files, audited above)
