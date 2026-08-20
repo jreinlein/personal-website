@@ -1,7 +1,7 @@
 # Pottery Gallery — Scoping & Plan
 
-Status: **Phases 1–2 (pipeline, page) complete; Phase 3 (content) in progress**
-Last updated: 2026-08-19
+Status: **Phases 1–2 (pipeline, page) complete and live at /pottery; Phase 3 (content) not started — pottery.json is still 126/126 empty stubs**
+Last updated: 2026-08-20
 
 Adds a photo gallery at `jamesreinlein.com/pottery` showing James's pottery work.
 Purely a portfolio — no commerce, no contact-about-this-piece flow.
@@ -174,8 +174,9 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 - [x] Photo backlog in `originals/` (126 files, audited above)
 - [x] `IMG_0998.jpg` confirmed as James's work; date resolved by interpolation
 - [x] Run the build; confirm all 126 land with a sensible date
-- [ ] Fill in `pottery.json` from notes where they exist
-- [ ] Review output size before committing
+- [x] Review output size before committing — 7.8MB, well under the 45MB estimate
+- [ ] Fill in `pottery.json` from notes where they exist — confirmed 2026-08-20,
+      still 0/126 entries have any content; page shows dates only until this lands
 
 ---
 

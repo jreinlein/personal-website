@@ -1,6 +1,6 @@
 # Next Steps
 
-Single entry point for outstanding work. Last updated 2026-08-19.
+Single entry point for outstanding work. Last updated 2026-08-20.
 
 This is an **index, not a spec** — it links to the docs that hold the detail
 rather than repeating them, so there's only one copy of each fact to keep
@@ -11,15 +11,26 @@ current. Delete items as they land.
 ## Where things stand
 
 The pottery gallery's **build pipeline (Phase 1) and page (Phase 2) are both
-done**; only Phase 3 (filling in `pottery.json` content) remains. The
-infrastructure is understood and documented, the photo set is audited, and the
-repo is set up so scaffolding doesn't leak onto the public site.
+done and live** — `/pottery` (`91f9b83`, `3fb4259`) is pushed and returns 200
+on the real site (verified 2026-08-20: `https://jamesreinlein.com/pottery`
+redirects 301 → `/pottery/` → 200). Only Phase 3 (filling in `pottery.json`
+content) remains. The infrastructure is understood and documented, the photo
+set is audited, and the repo is set up so scaffolding doesn't leak onto the
+public site.
 
-Verified working as of 2026-08-19:
+SSH on Windows is also fixed (was the other open item here) — see
+[hosting.md — Git](hosting.md#git). `origin` is now
+`git@github.com:jreinlein/personal-website.git`, using a fresh passphrase-less
+ed25519 key registered on GitHub as an auth key. No agent setup needed: the
+key has no passphrase, so ssh reads it straight off disk every time,
+regardless of shell/session/reboot.
+
+Verified working as of 2026-08-19 (pipeline/page) and 2026-08-20 (SSH, deploy):
 
 - `_redirects` hides `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `scripts/`
   from the live site while every real asset still serves.
-- Netlify auto-deploys on push to `master`; `git push` over HTTPS works.
+- Netlify auto-deploys on push to `master`; `git push` now works over SSH
+  (switched from HTTPS 2026-08-20).
 - 126 source photos sit in the gitignored `originals/`, all JPG, all dated.
 - [scripts/build_gallery.py](../scripts/build_gallery.py) ran against all 126
   real photos: reads EXIF date + dimensions, interpolates the one missing date
@@ -56,8 +67,8 @@ Verified working as of 2026-08-19:
   sit next to one from years earlier. `css/pottery.css` now uses `flex-wrap`
   instead, trading gap-free packing for DOM order matching visual row order.
 - `pottery/index.html`, `css/pottery.css`, and the `index.html` nav link are
-  **committed** (`91f9b83` homepage icons, `3fb4259` page generation) but
-  not yet pushed.
+  **committed and pushed** (`91f9b83` homepage icons, `3fb4259` page
+  generation) — live on the real site.
 
 Verified in the Netlify dashboard as of 2026-08-18 (→ [hosting.md — checklist](hosting.md#netlify-dashboard-checklist--completed-2026-08-18)):
 
@@ -124,13 +135,10 @@ before the first `npm install` rather than after. Decisions:
 
 Phases 1 and 2 are done — see "Where things stand" above. What's left:
 
-- Fill in `pottery.json` titles/clay/glaze/notes where they're known — every
-  entry is currently an empty stub, so the live page will show dates only
-  until this happens.
+- Fill in `pottery.json` titles/clay/glaze/notes where they're known — all
+  126 entries are still empty stubs (confirmed 2026-08-20), so the live page
+  currently shows dates only.
 - Check the page on a real phone, not just an emulated viewport.
-- Push (`91f9b83`, `3fb4259`) — this is the change that actually makes
-  `/pottery` reachable, since the Phase 1 commit shipped the derivatives but
-  nothing linked to them yet.
 
 ---
 
@@ -139,9 +147,6 @@ Phases 1 and 2 are done — see "Where things stand" above. What's left:
 - **Archive `jreinlein/jreinlein.github.io`.** Confirmed it cannot affect the
   live site. Only the `jreinlein.github.io` redirect is lost.
   → [hosting.md — Open cleanup](hosting.md#open-cleanup)
-- **Sort out SSH on Windows.** The stale `~/.ssh/id_rsa` is rejected by GitHub;
-  the working key lives in WSL. HTTPS works today, so this is only worth doing if
-  SSH is wanted again. → [hosting.md — Git](hosting.md#git)
 
 ## Deferred features
 
@@ -156,3 +161,6 @@ entry, AVIF output.
   takes effect from the next session onward, not the one that created it.
 - `git push` is deliberately not pre-allowed — pushing deploys the live site.
 - Don't trust `origin/master` without fetching first; it has been years stale.
+- `origin` is SSH (`git@github.com:jreinlein/personal-website.git`), not HTTPS.
+  The key (`~/.ssh/id_ed25519`) has no passphrase and `~/.ssh/config` points
+  `github.com` at it directly — no ssh-agent needed, works from any fresh shell.

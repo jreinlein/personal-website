@@ -96,17 +96,33 @@ The first three should be 404, `index.html` 200.
 
 ## Git
 
-The remote is **HTTPS**, not SSH:
+The remote is **SSH** (switched back from HTTPS 2026-08-20):
 
 ```
-origin  https://github.com/jreinlein/personal-website.git
+origin  git@github.com:jreinlein/personal-website.git
 ```
 
-It was switched from SSH in Aug 2026 because the Windows checkout had no key
-GitHub accepts — the working SSH key lives in WSL, whose `~/.ssh` is a separate
-filesystem from `C:\Users\<user>\.ssh`. HTTPS + Git Credential Manager sidesteps
-this. A stale `~/.ssh/id_rsa` (2022) is still present on Windows and is offered
-first by SSH; it is rejected by GitHub.
+Earlier in Aug 2026 this was switched to HTTPS because the Windows checkout had
+no key GitHub accepted — the old `~/.ssh/id_rsa` (2022) was stale and rejected,
+and the only working key lived in WSL, a separate filesystem from
+`C:\Users\<user>\.ssh`. Fixed 2026-08-20 by generating a fresh ed25519 keypair
+directly on Windows (`~/.ssh/id_ed25519`), registering its public key on
+GitHub as an **authentication key** (not a signing key), and pointing
+`~/.ssh/config` at it for `github.com`:
+
+```
+Host github.com
+    HostName github.com
+    User git
+    IdentityFile ~/.ssh/id_ed25519
+    IdentitiesOnly yes
+    AddKeysToAgent yes
+```
+
+The key has **no passphrase**, so `ssh` reads it straight off disk on every
+invocation — no `ssh-agent` needs to be running, and nothing needs re-doing
+after a reboot or a fresh shell. The old `~/.ssh/id_rsa` is still present but
+unused (superseded, not registered on GitHub); harmless to leave or remove.
 
 **History has diverged before.** In March 2024 the same edit was committed twice
 — once locally, once via GitHub's web editor — leaving twin commits with
@@ -195,5 +211,5 @@ action needed there.
   old links. Archiving is preferable to deleting; afterwards confirm with
   `curl -sSI https://jreinlein.github.io` whether Pages (and the redirect)
   survived archiving — that is not certain.
-- Remove the stale `~/.ssh/id_rsa` on Windows, or replace it with an ed25519 key
-  registered to GitHub, if SSH is ever wanted again.
+- Optionally delete the now-unused `~/.ssh/id_rsa`/`id_rsa.pub` on Windows —
+  superseded by `id_ed25519` (see [Git](#git)), left in place but inert.
