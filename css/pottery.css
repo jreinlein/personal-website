@@ -19,16 +19,10 @@
 
 .pswp-gallery figure {
   margin: 0;
-  width: 100%;
+  width: calc(50% - 0.5em);
 }
 
 @media only screen and (min-width: 550px) {
-  .pswp-gallery figure {
-    width: calc(50% - 0.5em);
-  }
-}
-
-@media only screen and (min-width: 900px) {
   .pswp-gallery figure {
     width: calc(33.3333% - 0.6667em);
   }
