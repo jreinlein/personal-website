@@ -62,6 +62,16 @@ a:hover {
   text-align: center;
 }
 
+.social + .social {
+  margin-top: 0.15em;
+}
+
+.icon-vase svg {
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.08em;
+}
+
 .oops {
   text-align: center;
 }
