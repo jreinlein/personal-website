@@ -204,12 +204,14 @@ action needed there.
 
 ## Open cleanup
 
-- Retire `jreinlein/jreinlein.github.io` (archive or delete) to remove the
-  ambiguity permanently. Verified 2026-08-17 that it cannot affect the live
-  site: the apex resolves to Netlify, and GitHub serves only a 301 from its own
-  `*.github.io` URL. The only thing lost is that redirect, which may appear in
-  old links. Archiving is preferable to deleting; afterwards confirm with
-  `curl -sSI https://jreinlein.github.io` whether Pages (and the redirect)
-  survived archiving — that is not certain.
 - Optionally delete the now-unused `~/.ssh/id_rsa`/`id_rsa.pub` on Windows —
   superseded by `id_ed25519` (see [Git](#git)), left in place but inert.
+
+## Done
+
+- **`jreinlein/jreinlein.github.io` archived (2026-08-20).** Verified
+  2026-08-17 it couldn't affect the live site: the apex resolves to Netlify,
+  and GitHub only ever served a 301 from its own `*.github.io` URL. Confirmed
+  2026-08-20 that the redirect **did survive archiving** —
+  `curl -sSI https://jreinlein.github.io` still returns
+  `301 → http://jamesreinlein.com/`.

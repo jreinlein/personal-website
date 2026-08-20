@@ -153,9 +153,9 @@ Phases 1 and 2 are done — see "Where things stand" above. What's left:
 
 ## Optional cleanup — no deadline
 
-- **Archive `jreinlein/jreinlein.github.io`.** Confirmed it cannot affect the
-  live site. Only the `jreinlein.github.io` redirect is lost.
-  → [hosting.md — Open cleanup](hosting.md#open-cleanup)
+Nothing outstanding right now — `jreinlein/jreinlein.github.io` was archived
+2026-08-20, redirect confirmed still working.
+→ [hosting.md — Done](hosting.md#done)
 
 ## Deferred features
 
