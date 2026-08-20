@@ -122,6 +122,7 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 ### Front-end
 
 - **Grid:** CSS `columns` masonry. Zero JS, handles mixed portrait/landscape.
+  *Superseded — switched to flex-wrap during Phase 2, see below.*
 - **Lightbox:** PhotoSwipe v5 (MIT, ~30KB, no deps, ESM from CDN). Chosen for
   touch handling — pinch zoom and swipe-to-dismiss — since most traffic is mobile.
   Needs `data-pswp-width/height` per image, which the script emits from EXIF.
@@ -154,21 +155,27 @@ Accepts `YYYY`, `YYYY-MM`, or `YYYY-MM-DD`.
 - [x] HTML generation into `pottery/index.html` — `render_page()`/`render_figure()`
       in `scripts/build_gallery.py` emit it from the same EXIF + `pottery.json`
       data the pipeline already loads, on every run.
-- [x] `css/pottery.css` — flex-wrap grid (1/2/3 columns by viewport width),
-      matching the existing Skeleton + `custom.css` look. Originally built as
-      CSS-columns masonry, but that fills column-by-column, which breaks
-      reading order (row N could pair a brand-new photo against one from years
-      earlier). Switched to flex-wrap so DOM order matches visual row order,
-      trading away gap-free packing for correct chronological order.
+- [x] `css/pottery.css` — flex-wrap grid (2/3 columns by viewport width: base
+      2, 3 at 550px+), matching the existing Skeleton + `custom.css` look.
+      Originally built as CSS-columns masonry, but that fills column-by-column,
+      which breaks reading order (row N could pair a brand-new photo against
+      one from years earlier). Switched to flex-wrap so DOM order matches
+      visual row order, trading away gap-free packing for correct
+      chronological order. The first breakpoint was originally 550px for
+      *both* tiers (1 column below it), which meant portrait phones
+      (~375-430px) never left 1 column — caught in the 2026-08-20 real-phone
+      check and fixed.
 - [x] Wire up PhotoSwipe v5 + captions — ESM from CDN, `data-pswp-width/height`
       emitted from the actual derivative dimensions (not source EXIF). Verified
-      by driving the lightbox open programmatically in-browser.
+      by driving the lightbox open programmatically in-browser, then confirmed
+      on a real phone (pinch-zoom, swipe-navigate) 2026-08-20.
 - [x] Link to `/pottery` from `index.html`
 - [x] `<title>`, description, Open Graph tags for link previews
-- [x] Checked responsive breakpoints (375px/1280px) and no-JS degradation
+- [x] Checked responsive breakpoints (375px/700px) and no-JS degradation
       (figure anchors point straight at the full-size image) via the browser's
-      DOM/network inspection. **Not yet checked on a real physical phone** —
-      worth a manual pass before calling this fully done.
+      DOM/network inspection, **and on a real physical phone (2026-08-20)** —
+      chronological order, lightbox, pinch-zoom, swipe, and progressive
+      thumbnail loading all confirmed.
 
 ### Phase 3 — Content
 - [x] Photo backlog in `originals/` (126 files, audited above)

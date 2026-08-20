@@ -25,7 +25,8 @@ ed25519 key registered on GitHub as an auth key. No agent setup needed: the
 key has no passphrase, so ssh reads it straight off disk every time,
 regardless of shell/session/reboot.
 
-Verified working as of 2026-08-19 (pipeline/page) and 2026-08-20 (SSH, deploy):
+Verified working as of 2026-08-19 (pipeline/page) and 2026-08-20 (SSH, deploy,
+real-phone check, grid/copy fixes):
 
 - `_redirects` hides `docs/`, `AGENTS.md`, `CLAUDE.md`, `README.md`, `scripts/`
   from the live site while every real asset still serves.
@@ -47,15 +48,24 @@ Verified working as of 2026-08-19 (pipeline/page) and 2026-08-20 (SSH, deploy):
   pytest suite (`python -m pytest scripts/test_build_gallery.py`) that doesn't
   depend on `originals/` existing, so it also runs on a fresh clone or in CI.
   Both currently report clean on all 126 photos.
-- The page itself: `css/pottery.css` (flex-wrap grid, 1/2/3 columns by
+- The page itself: `css/pottery.css` (flex-wrap grid, 2/3 columns by
   viewport — switched from an initial CSS-columns masonry after it produced
   a reading-order bug, see below), PhotoSwipe v5 wired via CDN ESM, `/pottery`
   linked from `index.html`, `<title>`/description/OG tags set. Verified
   locally via `python -m http.server` + the browser's DOM/network/console
-  inspection: responsive breakpoints at 375px and 1280px, PhotoSwipe opens
-  correctly (driven programmatically since the sandboxed browser pane
-  couldn't screenshot), and no-JS degradation (figure anchors point straight
-  at the full-size image). **Not yet checked on a real physical phone.**
+  inspection, and no-JS degradation (figure anchors point straight at the
+  full-size image).
+- **Checked on a real phone (2026-08-20)** — chronological order, lightbox
+  open/close, pinch-zoom, and swipe-navigate all confirmed working. Turned up
+  one real bug: the first grid breakpoint was `min-width: 550px`, wider than
+  any phone in portrait (~375-430px), so phones always got a single column —
+  126 photos in one endless scroll. Fixed in `css/pottery.css` (`0d67a70`):
+  base is now 2 columns, 3 at 550px+. Verified in-browser at 375px (2 columns)
+  and 700px (3 columns) before pushing.
+- Header copy said "126 pieces" — overcounts, since a piece often has several
+  photos. Changed to "126 photos" at the source
+  ([scripts/build_gallery.py](../scripts/build_gallery.py)) and regenerated
+  (`64498b0`), not hand-edited in the generated HTML.
 - Homepage nav: a hand-drawn vase SVG icon (`.icon-vase` in
   `css/custom.css`) links `/pottery` from the social-icon row, since the
   site's icon font has no pottery-shaped glyph. Icons reorganized into two
@@ -138,7 +148,6 @@ Phases 1 and 2 are done — see "Where things stand" above. What's left:
 - Fill in `pottery.json` titles/clay/glaze/notes where they're known — all
   126 entries are still empty stubs (confirmed 2026-08-20), so the live page
   currently shows dates only.
-- Check the page on a real phone, not just an emulated viewport.
 
 ---
 
