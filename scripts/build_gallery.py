@@ -196,7 +196,7 @@ def render_page(photos, sidecar):
   <div class="container">
     <header class="pottery-header">
       <h1><a href="/">James Reinlein</a> — Pottery</h1>
-      <p>{len(photos)} pieces, {photos[-1]['date'].strftime('%Y') if photos else ''}–{photos[0]['date'].strftime('%Y') if photos else ''}.</p>
+      <p>{len(photos)} photos, {photos[-1]['date'].strftime('%Y') if photos else ''}–{photos[0]['date'].strftime('%Y') if photos else ''}.</p>
     </header>
 
     <div class="pswp-gallery" id="pottery-gallery">
